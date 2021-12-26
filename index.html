@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>MediaSession API Demo</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script type="module">
+		const songs = [...document.querySelectorAll('audio')];
+		let currentSong = songs[0];
+		//TODO: jakas klasa dla tego ktory jest odtwarzany
+		//TODO: moze tez button przesuwajacy o X sekund?
+
+		const updateMetadata = playbackState => {
+			const descriptionItems = currentSong.parentNode.querySelector('a').innerHTML.split(' ');
+			navigator.mediaSession.metadata = new MediaMetadata({
+				title: descriptionItems[0],
+				artist: descriptionItems[descriptionItems.length - 1],
+			});
+			navigator.mediaSession.playbackState = playbackState;
+		};
+		const onPlayClicked = () => {
+			currentSong.play();
+
+			updateMetadata('playing');
+		};
+		const onStopClicked = () => {
+			currentSong.pause();
+			currentSong.currentTime = 0;
+
+			updateMetadata('none');
+		};
+		const onPauseClicked = () => {
+			currentSong.pause();
+
+			updateMetadata('paused');
+		};
+		const onPreviousClicked = () => {
+			currentSong.pause();
+			currentSong.currentTime = 0;
+			const currentSongIndex = songs.findIndex(el => el === currentSong);
+			//TODO: opisac do w artykule
+			const newCurrentSongIndex = (() => {
+				if (currentSongIndex === 0) {
+					return songs.length - 1;
+				}
+				return currentSongIndex - 1;
+			})();
+			currentSong = songs[newCurrentSongIndex];
+			currentSong.play();
+
+			updateMetadata('playing');
+		};
+		const onNextClicked = () => {
+			currentSong.pause();
+			currentSong.currentTime = 0;
+			const currentSongIndex = songs.findIndex(el => el === currentSong);
+			//TODO: opisac do w artykule
+			const newCurrentSongIndex = (() => {
+				if (currentSongIndex === songs.length - 1) {
+					return 0;
+				}
+				return currentSongIndex + 1;
+			})();
+			currentSong = songs[newCurrentSongIndex];
+			currentSong.play();
+
+			updateMetadata('playing');
+		};
+		document.querySelector('#play').addEventListener('click', onPlayClicked);
+		document.querySelector('#stop').addEventListener('click', onStopClicked);
+		document.querySelector('#pause').addEventListener('click', onPauseClicked);
+		document.querySelector('#previous').addEventListener('click', onPreviousClicked);
+		document.querySelector('#next').addEventListener('click', onNextClicked);
+
+		navigator.mediaSession.setActionHandler('play', onPlayClicked);
+		navigator.mediaSession.setActionHandler('pause', onPauseClicked);
+		navigator.mediaSession.setActionHandler('stop', onStopClicked);
+		navigator.mediaSession.setActionHandler('previoustrack', onPreviousClicked);
+		navigator.mediaSession.setActionHandler('nexttrack', onNextClicked);
+	</script>
+</head>
+<body>
+    <h1>MediaSession API Demo</h1>
+	<p>
+	  <button id="play">Play</button>
+	  <button id="stop">Stop</button>
+	  <button id="pause">Pause</button>
+	  <button id="previous">Previous</button>
+	  <button id="next">Next</button>
+	</p>
+	<p>
+	  <a href="https://www.bensound.com/royalty-free-music/track/dubstep">Dubstep from BenSound</a>
+	  <br>
+	  <audio controls src="bensound-dubstep.mp3"></audio>
+	</p>
+	<p>
+	  <a href="https://www.bensound.com/royalty-free-music/track/better-days">BetterDays from BenSound</a>
+	  <br>
+	  <audio controls src="bensound-betterdays.mp3"></audio>
+	</p>
+	<p>
+	  <a href="https://www.bensound.com/royalty-free-music/track/sunny">Sunny from BenSound</a>
+	  <br>
+	  <audio controls src="bensound-sunny.mp3"></audio>
+	</p>
+	<p>
+	  <a href="https://www.bensound.com/royalty-free-music/track/energy">Energy from BenSound</a>
+	  <br>
+	  <audio controls src="bensound-energy.mp3"></audio>
+	</p>
+	<p>
+	  <a href="https://www.bensound.com/royalty-free-music/track/epic">Epic from BenSound</a>
+	  <br>
+	  <audio controls src="bensound-epic.mp3"></audio>
+	</p>
+</body>
+</html>
